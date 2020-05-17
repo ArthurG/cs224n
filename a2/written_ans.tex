@@ -1,0 +1,74 @@
+\documentclass[11pt,largemargins]{homework}
+
+\newcommand{\hwname}{}
+\newcommand{\hwemail}{arthurg}
+\newcommand{\hwtype}{}
+\newcommand{\hwnum}{}
+\newcommand{\hwclass}{cs224n}
+\newcommand{\hwlecture}{a2}
+\newcommand{\hwsection}{}
+
+% This is just used to generate filler content. You don't need it in an actual
+% homework!
+\usepackage{lipsum}
+
+\begin{document}
+\maketitle
+ 
+\question
+  Notice that $y_w = 1$ if $w = o$ and $y_w = 0$ iff $w \ne o$
+
+  So the LHS of the equation, when $w=0$, the terms will drop off. We end up with only the term $1 * log (\hat{y}_w)$ when $w = o$. This simplifies LHS to $-log (\hat{y}_o)$ 
+
+\question
+$$ J = -\log{\frac{\exp(u_o^T v_c)}{\sum_{w \in Vocab}{exp(u^T_w v_c)}}} = -\log{\exp(u_o^T v_c)} + \log{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} $$
+$$ J = -(u_o^T v_c) + \log{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} $$
+
+$$ \frac{\partial{J}}{\partial{v_c}} = \frac{\partial{(- u_o^T v_c)}}{\partial{v_c}} + \frac{\partial{\log{\sum_{w \in Vocab}{exp(u^T_w  v_c)}}}}{\partial{v_c}} $$
+$$ \frac{\partial{J}}{\partial{v_c}} = -u_o + \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * \frac{\partial{\sum_{w \in Vocab}{exp(u^T_w  v_c)}}}{\partial{v_c}} $$
+$$ \frac{\partial{J}}{\partial{v_c}} = -u_o + \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * (\sum_{w \in Vocab} \frac{\partial{{exp(u^T_w  v_c)}}}{\partial{v_c}}) $$
+$$ \frac{\partial{J}}{\partial{v_c}} = -u_o + \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * (\sum_{w \in Vocab} exp(u^T_w  v_c) \frac{\partial{u^T_w  v_c}}{\partial{v_c}}) $$
+$$ \frac{\partial{J}}{\partial{v_c}} = -u_o + \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * (\sum_{w \in Vocab} exp(u^T_w  v_c) u^T_w ) $$
+$$ \frac{\partial{J}}{\partial{v_c}} = -u_o + \sum_{w \in Vocab} u^T_w \frac{( exp(u^T_w  v_c))}{\sum_{x \in Vocab}{exp(u^T_x  v_c)}} $$
+$$ \frac{\partial{J}}{\partial{v_c}} = -u_o + \sum_{w \in Vocab} u^T_w P(O=w | C = c) $$
+$$ \frac{\partial{J}}{\partial{v_c}} = -u_o + U^T \hat{y}  $$
+$$ \frac{\partial{J}}{\partial{v_c}} =  U^T (\hat{y} - y)  $$
+
+
+\question
+Find partial deriv for $u_o$ first
+$$ \frac{\partial{J}}{\partial{u_o}} = \frac{\partial{(- u_o^T v_c)}}{\partial{u_o}} + \frac{\partial{\log{\sum_{w \in Vocab}{exp(u^T_w  v_c)}}}}{\partial{u_o}} $$
+$$ \frac{\partial{J}}{\partial{u_o}} = -v_c^T +  \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * \frac{\partial{\sum_{w \in Vocab}{exp(u^T_w  v_c)}}}{\partial{u_o}} $$
+$$ \frac{\partial{J}}{\partial{u_o}} = -v_c^T +  \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * \sum_{w \in Vocab}\frac{\partial{{exp(u^T_w  v_c)}}}{\partial{u_o}} $$
+$$ \frac{\partial{J}}{\partial{u_o}} = -v_c^T +  \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * \frac{\partial{exp(u^T_o  v_c)}}{\partial{u_o}} $$
+$$ \frac{\partial{J}}{\partial{u_o}} = -v_c^T +  \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} *exp(u^T_o  v_c)* v_c^T $$
+$$ \frac{\partial{J}}{\partial{u_o}} = -v_c^T +  \frac{exp(u^T_o  v_c)}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * v_c^T $$
+$$ \frac{\partial{J}}{\partial{u_o}} = -v_c^T + P(O=o|C=c) * v_c^T $$
+
+Find partial deriv for $u_w, w \ne o$
+$$ \frac{\partial{J}}{\partial{u_w}} = \frac{\partial{(- u_o^T v_c)}}{\partial{u_w}} + \frac{\partial{\log{\sum_{x \in Vocab}{exp(u^T_x  v_c)}}}}{\partial{u_w}} $$
+$$ \frac{\partial{J}}{\partial{u_w}} = \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * \frac{\partial{\sum_{x \in Vocab}{exp(u^T_x  v_c)}}}{\partial{u_w}} $$
+$$ \frac{\partial{J}}{\partial{u_w}} = \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * \sum_{x \in Vocab}\frac{\partial{{exp(u^T_x  v_c)}}}{\partial{u_w}} $$
+$$ \frac{\partial{J}}{\partial{u_w}} = \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * \frac{\partial{exp(u^T_w  v_c)}}{\partial{u_w}} $$
+$$ \frac{\partial{J}}{\partial{u_w}} = \frac{1}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} *exp(u^T_w  v_c)* v_c^T $$
+$$ \frac{\partial{J}}{\partial{u_w}} = \frac{exp(u^T_w  v_c)}{\sum_{w \in Vocab}{exp(u^T_w  v_c)}} * v_c^T $$
+$$ \frac{\partial{J}}{\partial{u_w}} = P(O=w|C=c) * v_c^T $$
+
+Overall, 
+$$ \frac{\partial{J}}{\partial{u_w}} =  (\hat{y} - y) * v_c^T $$
+
+\question
+$$\frac{d{\sigma(x)}}{d{x}} = \frac{d(1+e^{-x})^-1}{d(1+e^{-x})} \frac{d(1+e^{-x})}{d(-x)} \frac{d(-x)}{d{x}}$$
+$$\frac{d{\sigma(x)}}{d{x}} = (1+e^{-x})^{-2}*` e^{-x}* -1$$
+$$\frac{d{\sigma(x)}}{d{x}} = \frac{ e^{-x}}{(1+e^{-x})^{2}}$$
+$$\frac{d{\sigma(x)}}{d{x}} = \frac{ 1+e^{-x}-1}{(1+e^{-x})^{2}}$$
+$$\frac{d{\sigma(x)}}{d{x}} = (\frac{ 1+e^{-x}}{(1+e^{-x})} - \frac{1}{(1+e^{-x})} ) \frac{ 1}{(1+e^{-x})}$$
+$$\frac{d{\sigma(x)}}{d{x}} = (1 - \sigma{(x)}) \sigma{(x)} $$ 
+
+
+
+
+
+
+\end{document}
+
