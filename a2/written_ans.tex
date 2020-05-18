@@ -67,8 +67,36 @@ $$\frac{d{\sigma(x)}}{d{x}} = (1 - \sigma{(x)}) \sigma{(x)} $$
 
 
 
+\question
+
+$$ J = -\log{\sigma{(u_o^T v_c)}} - \sum_{k=1}^K \log{(\sigma{(-u_k^T v_c)})} $$
+Find Partial WRT $v_c$ 
+$$ \frac{\partial{J}}{\partial{v_c}} = \frac{\partial{(-\log{\sigma{(u_o^T v_c)}})}}{\partial{(\sigma{(u_o^T v_c)})}} \frac{{\partial{(\sigma{(u_o^T v_c)})}}}{\partial{(u_o^T v_c)}}\frac{\partial{(u_o^T v_c)}}{\partial{(v_c)}} - \sum_{k=1}^K \frac{\partial{\log{(\sigma{(-u_k^T v_c)})}}}{\partial{(\sigma{(-u_k^T v_c)})}} \frac{\partial{(\sigma{(-u_k^T v_c)})}} {\partial{(-u_k^T v_c)}} \frac{\partial{(-u_k^T v_c)}}{\partial{(v_c)}}$$
+
+$$ \frac{\partial{J}}{\partial{v_c}} = \frac{-1}{(\sigma{(u_o^T v_c)})} (1 - \sigma{(u_o^T v_c)})(\sigma{(u_o^T v_c)})u_o - \sum_{k=1}^K \frac{1}{(\sigma{(-u_k^T v_c)})} (\sigma{(-u_k^T v_c)})(1-\sigma{(-u_k^T v_c)}) (-u_k)$$
+$$ \frac{\partial{J}}{\partial{v_c}} = (\sigma{(u_o^T v_c)} - 1) u_o - \sum_{k=1}^K (1-\sigma{(-u_k^T v_c)}) (-u_k)$$
+$$ \frac{\partial{J}}{\partial{v_c}} = (\sigma{(u_o^T v_c)} - 1) u_o + \sum_{k=1}^K (1-\sigma{(-u_k^T v_c)}) (u_k)$$
+
+Find Partial WRT $u_o$ 
+$$ \frac{\partial{J}}{\partial{u_o}} = \frac{\partial{(-\log{\sigma{(u_o^T v_c)}})}}{\partial{(\sigma{(u_o^T v_c)})}} \frac{{\partial{(\sigma{(u_o^T v_c)})}}}{\partial{(u_o^T v_c)}}\frac{\partial{(u_o^T v_c)}}{\partial{(u_o)}} - \sum_{k=1}^K \frac{\partial{\log{(\sigma{(-u_k^T v_c)})}}}{\partial{(u_o)}}
+$$
+$$ \frac{\partial{J}}{\partial{u_o}} = \frac{-1}{(\sigma{(u_o^T v_c)})} (1 - \sigma{(u_o^T v_c)})(\sigma{(u_o^T v_c)})v_c$$
+$$ \frac{\partial{J}}{\partial{v_c}} = (\sigma{(u_o^T v_c)} - 1) v_c $$
+
+Find Partial WRT $u_x, x \ne o$ 
+$$ \frac{\partial{J}}{\partial{u_x}} = \frac{\partial{(-\log{\sigma{(u_o^T v_c)}})}}{\partial{(u_x)}} - \sum_{k=1}^K \frac{\partial{\log{(\sigma{(-u_k^T v_c)})}}}{\partial{(\sigma{(-u_k^T v_c)})}} \frac{\partial{(\sigma{(-u_k^T v_c)})}} {\partial{(-u_k^T v_c)}} \frac{\partial{(-u_k^T v_c)}}{\partial{(u_x)}}$$
+$$ \frac{\partial{J}}{\partial{u_x}} = - \frac{\partial{\log{(\sigma{(-u_x^T v_c)})}}}{\partial{(\sigma{(-u_x^T v_c)})}} \frac{\partial{(\sigma{(-u_x^T v_c)})}} {\partial{(-u_x^T v_c)}} \frac{\partial{(-u_x^T v_c)}}{\partial{(v_c)}}$$
+$$ \frac{\partial{J}}{\partial{u_x}} = \frac{-1}{(\sigma{(-u_x^T v_c)})} (\sigma{(-u_x^T v_c)})(1-\sigma{(-u_x^T v_c)}) (-v_c)$$
+$$ \frac{\partial{J}}{\partial{u_x}} = (1- \sigma{(-u_x^T v_c)}) (v_c)$$
 
 
+This is a lot more efficient than the naive-softmax implementation because naive-softmax uses $U, V$ matricies, which are $O(|vocab||embedding|)$. Meanwhile, this new implementation only uses certain rows of $U, V$, making the runtime $O(|K||embedding|)$ which is much smaller
+
+\question
+
+$$ \frac{\partial{J_{skip\_gram}}}{\partial{U}} = \sum_{-m \le j \le m, j \ne 0} \frac{\partial{(J)}}{\partial{U}}$$
+$$ \frac{\partial{J_{skip\_gram}}}{\partial{v_c}} = \sum_{-m \le j \le m, j \ne 0} \frac{\partial{(J)}}{\partial{v_c}}$$
+$$ \frac{\partial{J_{skip\_gram}}}{\partial{v_c}} = 0 $$
 
 \end{document}
 
