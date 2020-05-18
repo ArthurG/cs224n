@@ -17,6 +17,8 @@ def sigmoid(x):
     """
 
     ### YOUR CODE HERE (~1 Line)
+    s = 1 / ( 1 + np.exp(-x))
+ 
 
     ### END YOUR CODE
 
@@ -61,7 +63,16 @@ def naiveSoftmaxLossAndGradient(
     ### Please use the provided softmax function (imported earlier in this file)
     ### This numerically stable implementation helps you avoid issues pertaining
     ### to integer overflow. 
+    yhat = softmax(outsideVectors.dot(centerWordVec))
+    y = np.zeros(yhat.shape)
+    y[outsideWordIdx] = 1
 
+    diff = (yhat - y)
+    loss = -np.sum(np.log(yhat).dot(y))
+    gradCenterVec = diff.T.dot(outsideVectors)
+    
+    vc = centerWordVec.reshape((1, centerWordVec.shape[0]))
+    gradOutsideVecs = diff.reshape(diff.shape[0], 1).dot(vc)
     ### END YOUR CODE
 
     return loss, gradCenterVec, gradOutsideVecs
@@ -84,9 +95,10 @@ def negSamplingLossAndGradient(
     outsideWordIdx,
     outsideVectors,
     dataset,
-    K=10
-):
-    """ Negative sampling loss function for word2vec models
+    K=10):
+
+    """
+    Negative sampling loss function for word2vec models
 
     Implement the negative sampling loss and gradients for a centerWordVec
     and a outsideWordIdx word vector as a building block for word2vec
@@ -97,6 +109,26 @@ def negSamplingLossAndGradient(
     double count the gradient with respect to this word. Thrice if
     it was sampled three times, and so forth.
 
+    Arguments:
+    centerWordVec -- numpy ndarray, center word's embedding
+                    in shape (word vector length, )
+                    (v_c in the pdf handout)
+    outsideWordIdx -- integer, the index of the outside word
+                    (o of u_o in the pdf handout)
+    outsideVectors -- outside vectors is
+                    in shape (num words in vocab, word vector length) 
+                    for all words in vocab (U in the pdf handout)
+    dataset -- needed for negative sampling, unused here.
+
+    Return:
+    loss -- naive softmax loss
+    gradCenterVec -- the gradient with respect to the center word vector
+                     in shape (word vector length, )
+                     (dJ / dv_c in the pdf handout)
+    gradOutsideVecs -- the gradient with respect to all the outside word vectors
+                    in shape (num words in vocab, word vector length) 
+                    (dJ / dU)
+   
     Arguments/Return Specifications: same as naiveSoftmaxLossAndGradient
     """
 
@@ -106,12 +138,28 @@ def negSamplingLossAndGradient(
     indices = [outsideWordIdx] + negSampleWordIndices
 
     ### YOUR CODE HERE (~10 Lines)
+    sigmoid_ukv = sigmoid(-outsideVectors[negSampleWordIndices].dot(centerWordVec))
+    sigmoid_uov = sigmoid(outsideVectors[outsideWordIdx].dot(centerWordVec))
 
     ### Please use your implementation of sigmoid in here.
+    loss = -np.log(sigmoid_uov) - np.sum(np.log(sigmoid_ukv))
+    sigmoid_ukv = sigmoid_ukv.reshape(1, sigmoid_ukv.shape[0])
+    gradCenterVec = (sigmoid_uov-1)* outsideVectors[outsideWordIdx]  + (1-(sigmoid_ukv)).dot(outsideVectors[negSampleWordIndices])
+ 
+
+    centerWordVec = centerWordVec.reshape(centerWordVec.shape[0], 1)
+
+    gradOutsideVecs = np.zeros(outsideVectors.shape)
+    gradOutsideVecs[outsideWordIdx, :] = (sigmoid_uov-1) * (centerWordVec.T)
+
+    update =  (1-sigmoid_ukv.T).dot(centerWordVec.T)
+    for idx, i in (enumerate(negSampleWordIndices)):
+        gradOutsideVecs[i] += update[idx]
 
     ### END YOUR CODE
 
     return loss, gradCenterVec, gradOutsideVecs
+
 
 
 def skipgram(currentCenterWord, windowSize, outsideWords, word2Ind,
@@ -154,7 +202,12 @@ def skipgram(currentCenterWord, windowSize, outsideWords, word2Ind,
     gradOutsideVectors = np.zeros(outsideVectors.shape)
 
     ### YOUR CODE HERE (~8 Lines)
-
+    for outsideWord in outsideWords:
+       a, b, c = word2vecLossAndGradient(centerWordVectors[word2Ind[currentCenterWord]],
+                                         word2Ind[outsideWord], outsideVectors, dataset)
+       loss += a
+       gradCenterVecs[word2Ind[currentCenterWord]] += b.ravel()
+       gradOutsideVectors += c
     ### END YOUR CODE
     
     return loss, gradCenterVecs, gradOutsideVectors
