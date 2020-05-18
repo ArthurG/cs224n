@@ -96,7 +96,7 @@ This is a lot more efficient than the naive-softmax implementation because naive
 
 $$ \frac{\partial{J_{skip\_gram}}}{\partial{U}} = \sum_{-m \le j \le m, j \ne 0} \frac{\partial{(J)}}{\partial{U}}$$
 $$ \frac{\partial{J_{skip\_gram}}}{\partial{v_c}} = \sum_{-m \le j \le m, j \ne 0} \frac{\partial{(J)}}{\partial{v_c}}$$
-$$ \frac{\partial{J_{skip\_gram}}}{\partial{v_c}} = 0 $$
+$$ \frac{\partial{J_{skip\_gram}}}{\partial{v_w}} = 0, w \ne c $$
 
 \end{document}
 
