@@ -18,7 +18,6 @@ class PartialParse(object):
         """
         # The sentence being parsed is kept for bookkeeping purposes. Do not alter it in your code.
         self.sentence = sentence
-
         ### YOUR CODE HERE (3 Lines)
         ### Your code should initialize the following fields:
         ###     self.stack: The current stack represented as a list with the top of the stack as the
@@ -31,7 +30,9 @@ class PartialParse(object):
         ###
         ### Note: The root token should be represented with the string "ROOT"
         ###
-
+        self.stack = ["ROOT"]
+        self.buffer = sentence[:]
+        self.dependencies = []
 
         ### END YOUR CODE
 
@@ -50,6 +51,22 @@ class PartialParse(object):
         ###         1. Shift
         ###         2. Left Arc
         ###         3. Right Arc
+        if transition == "S":
+            self.stack.append(self.buffer.pop(0))
+        elif transition == "LA":
+            t1 = self.stack.pop()
+            t2 = self.stack.pop()
+            self.dependencies.append((t1, t2))
+            self.stack.append(t1)
+        elif transition == "RA":
+            t1 = self.stack.pop()
+            t2 = self.stack.pop()
+            self.dependencies.append((t2, t1))
+            self.stack.append(t2)
+        else:
+            raise ValueError("{} is not a valid transition".format(transition))
+
+ 
 
 
         ### END YOUR CODE
