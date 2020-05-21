@@ -39,6 +39,37 @@ We want to apply dropout during training so that some hidden units will learn si
 
 During evaluation, we want to use all the units to get the best results. Although some hidden units may have learned the same information, having all of them present is kind of similar to taking a "vote" amongst the hidden units and choosing the best results. 
 
+\question
+
+\begin{center}
+\begin{tabular}{ |c|c|c|c| }
+ \hline
+   Stack & Buffer & New Dep & Trans \\
+   (root) & (i parsed this sentence correctly) &  & Initial Config \\
+   (root, i) & (parsed this sentence correctly) &  & shift \\
+   (root, i, parsed) & (this sentence correctly) &  & shift \\
+   (root, parsed) & (this sentence correctly) & parsed -> I & left-arc \\
+   (root, parsed, this) & (sentence correctly) &  & shift \\
+   (root, parsed, this, sentence) & (correctly) &  & shift \\
+   (root, parsed, sentence) & (correctly) & sentence -> this & left-arc \\
+   (root, parsed) & (correctly) & parsed -> sentence  & right-arc \\
+   (root, parsed, correctly) & () &  & shift \\
+   (root, parsed) & () & parsed->correctly  & right-arc \\
+   (root) & () & root->parsed  & right-arc \\
+ \hline
+\end{tabular}
+\end{center}
+
+\question
+
+We know that we must call SHIFT once for every single word to move the word from buffer to stack (n SHIFT steps).
+
+We also know that in a tree w/ n nodes, there are n-1 verticies. In our final parse tree, we have exactly n+1 nodes (n words + 1 ROOT). In addition, each LEFT-ARC or RIGHT-ARC step creates exactly 1 edge. Hence, there are exactly n ARC steps. 
+
+In total, there will be $n + n = 2n$ parse steps. If you count the initial config as a step too, then there will be $2n+1$ parse steps. 
+
+
+
 
 \end{document}
 
