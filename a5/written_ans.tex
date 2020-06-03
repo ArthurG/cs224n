@@ -45,5 +45,18 @@ I tested my Highway network by:
 2. Set the weights of $w$, and send in an $x_{conv\_out}$ vector (of size 5). Manually do the matrix math to check the output matches. In these test cases, I made sure to find cases where the sigmoid is 0, sigmoid is 1, and where the relu is 0. 
 
 I'm confident that these two tests will cover the edge cases. In general, since I used pre-defined components in PyTorch, most of the edge cases are handled for me. 
+
+\question 
+
+I tested my CNN network by:
+
+1. Running the CNN on a batch of $x_{emb}$ to check the dimensions are correct 
+
+2. Set the weights of $w$, and send in an $x_{emb}$. Through hand computing the convlustion, and pooling operation, I manually network was acting properly. 
+
+3. Set the weights of $w$, and send in an $x_{emb}$. Through hand computing the convlustion, and RELU operation, I manually network was acting properly. 
+
+I'm confident that these three tests will cover the edge cases. In general, since I used pre-defined components in PyTorch, most of the edge cases are handled for me. 
+ 
  
 \end{document}

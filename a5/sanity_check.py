@@ -7,6 +7,7 @@ sanity_check.py: sanity checks for assignment 5
 Usage:
     sanity_check.py 1e
     sanity_check.py 1f
+    sanity_check.py 1g
     sanity_check.py 1h
     sanity_check.py 2a
     sanity_check.py 2b
@@ -29,6 +30,7 @@ from vocab import Vocab, VocabEntry
 from char_decoder import CharDecoder
 from nmt_model import NMT
 from highway import Highway
+from cnn import CNN
 
 
 import torch
@@ -84,6 +86,7 @@ def question_1f_sanity_check():
     highway = Highway(100)
     out = highway(inputs)
     expected_out_shape = (5, 100)
+    assert(torch.Size(expected_out_shape) == out.shape), "The shape of Highway output is incorrect" 
 
     """ Matrix Mult for Highway Class """
 
@@ -115,6 +118,69 @@ def question_1f_sanity_check():
 
     print("Sanity Check Passed for Question 1f: Highway Class")
     print("-"*80)
+
+
+def question_1g_sanity_check():
+    """ Sanity check for CNN() class.
+    """
+    print ("-"*80)
+    print("Running Sanity Check for Question 1g: CNN Class")
+
+
+    """ Shape Dimension Check for CNN Class """
+    batch_size = 6
+
+    m_word_size = 100
+    e_char_size = 20
+    num_filters = 10
+    k = 5
+
+    e_word_size = num_filters
+
+    inputs = torch.randint(100,size=(batch_size, e_char_size, m_word_size), dtype=torch.float)
+    convnet = CNN(100, 20, 10, 5, 1)
+    out = convnet(inputs)
+    expected_out_shape = (batch_size, e_word_size)
+
+
+    assert(torch.Size(expected_out_shape) == out.shape), "The shape of CNN output is incorrect" 
+
+
+    """ Hand Calculate Check for CNN Class """
+    def reinitialize_layers(model):
+        """ Reinitialize the Layer Weights for Sanity Checks.
+        """
+        def init_weights(m):
+            if type(m) == nn.Conv1d:
+                m.weight.data = torch.tensor([[[0.1, .1, .1, .1, .5]]])
+                if m.bias is not None:
+                    m.bias.data.fill_(-0.5)
+        with torch.no_grad():
+            model.apply(init_weights)
+
+    batch_size = 1
+    m_word_size = 6
+    e_char_size = 1
+    num_filters = 1
+    k = 5
+    e_word_size = num_filters
+
+    inputs = torch.tensor([[[1, 1, 1, 1, 0, 1]]], dtype=torch.float)
+    convnet = CNN(m_word_size, e_char_size, num_filters, k, 0)
+    reinitialize_layers(convnet)
+    out = convnet(inputs)
+    expected = np.array([[0.3]])
+    assert(np.allclose(expected, out.detach().numpy(), atol = 0.1)), "CNN network not giving expected output for simple test case 1"
+
+
+    inputs2 = torch.tensor([[[-1, -1, -1, -1, 0, -1]]], dtype=torch.float)
+    out2 = convnet(inputs2)
+    expected2 = np.array([[0]])
+    assert(np.allclose(expected2, out2.detach().numpy(), atol = 0.1)), "CNN network giving expected output for simple test case 2"
+
+    print("Sanity Check Passed for Question 1g: CNN Class")
+    print("-"*80)
+
 
 def question_1h_sanity_check(model):
     """ Sanity check for model_embeddings.py
@@ -217,6 +283,8 @@ def main():
         question_1e_sanity_check()
     elif args['1f']:
         question_1f_sanity_check()
+    elif args['1g']:
+        question_1g_sanity_check()
     elif args['1h']:
         question_1h_sanity_check(model)
     elif args['2a']:
