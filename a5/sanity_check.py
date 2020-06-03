@@ -79,11 +79,39 @@ def question_1f_sanity_check():
     print("Running Sanity Check for Question 1f: Highway Class")
 
 
+    """ Shape Dimension Check for Highway Class """
     inputs =torch.randint(100,size=(5, 100), dtype=torch.float)
     highway = Highway(100)
     out = highway(inputs)
     expected_out_shape = (5, 100)
 
+    """ Matrix Mult for Highway Class """
+
+    def reinitialize_layers(model):
+        """ Reinitialize the Layer Weights for Sanity Checks.
+        """
+        def init_weights(m):
+            if type(m) == nn.Linear:
+                m.weight.data = torch.tensor([[.1, .1, .1, .1, .1], [.03, .03, .03, .03, .03],[.5, .5, .5, .5, .5], [-.7, -.7, -.7,- .7, -.7], [-.9, -.9, -.9, -.9, -.9]] )
+                if m.bias is not None:
+                    m.bias.data.fill_(0.1)
+            elif type(m) == nn.Embedding:
+                m.weight.data.fill_(0.15)
+            elif type(m) == nn.Dropout:
+                nn.Dropout(DROPOUT_RATE)
+        with torch.no_grad():
+            model.apply(init_weights)
+
+    highway = Highway(5)
+    reinitialize_layers(highway)
+    inputs =torch.tensor([[3, 5, 7, 11, 13]], dtype=torch.float) # Sums to 39
+    # W * x + b = [3.9, 1.18, 19.6, -27.4, -35.2] 
+    # relu (w x + b) =  [3.9, 1.18, 19.6, 0, 0] 
+    # sigmoid(w x + b) = [.98, 0.76, 1, 0, 0]
+    # sgimoid * relu(wx + b) + (1- sigmoid) * x = [3.9, 2.09, 19.6, 11, 13]
+    ans = highway(inputs)
+    expected = np.array([3.9, 2.09, 19.6, 11, 13])
+    assert(np.allclose(expected, ans.detach().numpy(), atol = 0.1)), "highway function not giving expected output"
 
     print("Sanity Check Passed for Question 1f: Highway Class")
     print("-"*80)

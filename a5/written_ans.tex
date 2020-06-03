@@ -35,5 +35,15 @@ It's probably a better idea to set the bias to positive. This will ensure $x_{ga
 - Parallizes better on GPUs
 
 - Multi-headed attention might improve translation accuracy when trying to do things like verb - noun agreements 
+
+\question 
+
+I tested my Highway network by:
+
+1. Running a batch of $x_{conv\_out}$ to check the dimensions are correct 
+
+2. Set the weights of $w$, and send in an $x_{conv\_out}$ vector (of size 5). Manually do the matrix math to check the output matches. In these test cases, I made sure to find cases where the sigmoid is 0, sigmoid is 1, and where the relu is 0. 
+
+I'm confident that these two tests will cover the edge cases. In general, since I used pre-defined components in PyTorch, most of the edge cases are handled for me. 
  
 \end{document}
