@@ -6,6 +6,7 @@ CS224N 2019-20: Homework 5
 sanity_check.py: sanity checks for assignment 5
 Usage:
     sanity_check.py 1e
+    sanity_check.py 1f
     sanity_check.py 1h
     sanity_check.py 2a
     sanity_check.py 2b
@@ -27,6 +28,7 @@ from vocab import Vocab, VocabEntry
 
 from char_decoder import CharDecoder
 from nmt_model import NMT
+from highway import Highway
 
 
 import torch
@@ -45,8 +47,8 @@ class DummyVocab():
     def __init__(self):
         self.char2id = json.load(open('./sanity_check_en_es_data/char_vocab_sanity_check.json', 'r'))
         self.id2char = {id: char for char, id in self.char2id.items()}
-        self.char_pad = self.char2id['∏']
-        self.char_unk = self.char2id['Û']
+        self.char_pad = self.char2id['<pad>']
+        self.char_unk = self.char2id['<unk>']
         self.start_of_word = self.char2id["{"]
         self.end_of_word = self.char2id["}"]
 
@@ -68,6 +70,22 @@ def question_1e_sanity_check():
     assert list(output.size()) == output_expected_size, "output shape is incorrect: it should be:\n {} but is:\n{}".format(output_expected_size, list(output.size()))
 
     print("Sanity Check Passed for Question 1e: To Input Tensor Char!")
+    print("-"*80)
+
+def question_1f_sanity_check():
+    """ Sanity check for Highway() class.
+    """
+    print ("-"*80)
+    print("Running Sanity Check for Question 1f: Highway Class")
+
+
+    inputs =torch.randint(100,size=(5, 100), dtype=torch.float)
+    highway = Highway(100)
+    out = highway(inputs)
+    expected_out_shape = (5, 100)
+
+
+    print("Sanity Check Passed for Question 1f: Highway Class")
     print("-"*80)
 
 def question_1h_sanity_check(model):
@@ -169,6 +187,8 @@ def main():
 
     if args['1e']:
         question_1e_sanity_check()
+    elif args['1f']:
+        question_1f_sanity_check()
     elif args['1h']:
         question_1h_sanity_check(model)
     elif args['2a']:

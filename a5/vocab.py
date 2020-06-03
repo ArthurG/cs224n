@@ -162,6 +162,13 @@ class VocabEntry(object):
         ###         https://pytorch.org/docs/stable/tensors.html#torch.Tensor.view
 
         ### END YOUR CODE
+        sents_ind = self.words2charindices(sents)
+        sents_ind_padded = pad_sents_char(sents_ind,self.word2id['<pad>'])
+        sent_tensor = torch.tensor(sents_ind_padded)
+        # print("Sents shape ",t.shape)
+        sent_tensor_reshaped = torch.tensor(sents_ind_padded).transpose(0, 1).contiguous()
+        # print("Sents shape 2 ",t2.shape)
+        return sent_tensor_reshaped
 
     def to_input_tensor(self, sents: List[List[str]], device: torch.device) -> torch.Tensor:
         """ Convert list of sentences (words) into tensor with necessary padding for 
