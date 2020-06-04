@@ -36,7 +36,11 @@ class CharDecoder(nn.Module):
         ### YOUR CODE HERE for part 2a
         ### TODO - Implement the forward pass of the character decoder.
 
+        char_embs = self.decoderCharEmb(input)
+        output, (ht, ct) = self.charDecoder(char_embs, dec_hidden)
+        s = self.char_output_projection(output)
         ### END YOUR CODE
+        return s, (ht, ct)
 
     def train_forward(self, char_sequence, dec_hidden=None):
         """ Forward computation during training.
@@ -53,6 +57,13 @@ class CharDecoder(nn.Module):
         ###       - char_sequence corresponds to the sequence x_1 ... x_{n+1} (e.g., <START>,m,u,s,i,c,<END>). Read the handout about how to construct input and target sequence of CharDecoderLSTM.
         ###       - Carefully read the documentation for nn.CrossEntropyLoss and our handout to see what this criterion have already included:
         ###             https://pytorch.org/docs/stable/nn.html#crossentropyloss
+        lstm_input_chars = char_sequence[:-1,:]
+        fwd_out, hidden_new = self.forward(lstm_input_chars, dec_hidden)
+        lstm_expected_chars = char_sequence[1:,:]
+        loss = nn.CrossEntropyLoss(ignore_index=0, reduction="sum")
+        dim = lstm_input_chars.shape[0] * lstm_input_chars.shape[1] 
+        l =  loss(fwd_out.reshape(dim, -1), lstm_expected_chars.reshape(dim))
+        return l
 
         ### END YOUR CODE
 
@@ -75,6 +86,27 @@ class CharDecoder(nn.Module):
         ###      - You may find torch.argmax or torch.argmax useful
         ###      - We use curly brackets as start-of-word and end-of-word characters. That is, use the character '{' for <START> and '}' for <END>.
         ###        Their indices are self.target_vocab.start_of_word and self.target_vocab.end_of_word, respectively.
+        START = self.target_vocab.start_of_word
+        END = self.target_vocab.end_of_word
+
+        batch_size = initialStates[0].shape[1]
+        output_words = ['{'] * batch_size
+        prev_char = torch.tensor([[START] * batch_size], device=device)
+        softmax = nn.Softmax(dim=2)
+        for i in range(max_length):
+            scores, initialStates = self.forward(prev_char, initialStates)
+            p_t1 = softmax(scores)
+            current_char = torch.argmax(p_t1, dim=2)
+
+            for i in range(batch_size):
+                if output_words[i][-1] != '}':
+                    if current_char[0][i].item() == END:
+                        output_words[i] = output_words[i]+ "}"
+                    else:
+                        output_words[i] = output_words[i] + self.target_vocab.id2char[current_char[0][i].item()]
+            prev_char = current_char
+        return [word[1:-1] for word in output_words]
+
 
         ### END YOUR CODE
 
