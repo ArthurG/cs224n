@@ -11,6 +11,7 @@ Michael Hahn <mhahn2@stanford.edu>
 """
 
 import torch.nn as nn
+import torch
 
 # Do not change these imports; your module names should be
 #   `CNN` in the file `cnn.py`
@@ -37,6 +38,15 @@ class ModelEmbeddings(nn.Module):
         Hints: - You may find len(self.vocab.char2id) useful when create the embedding
         """
         super(ModelEmbeddings, self).__init__()
+        # print("word embed size", word_embed_size)
+
+        self.word_embed_size = word_embed_size
+        self.char_embed_size = 50
+
+        self.source = nn.Embedding(len(vocab.char2id), self.char_embed_size, vocab.char2id['∏'])
+
+        self.cnn = CNN(self.char_embed_size, word_embed_size)
+        self.highway = Highway(word_embed_size, 0.3)
 
         ### YOUR CODE HERE for part 1h
 
@@ -52,6 +62,18 @@ class ModelEmbeddings(nn.Module):
             CNN-based embeddings for each word of the sentences in the batch
         """
         ### YOUR CODE HERE for part 1h
+        # print("input shape ", input.shape) # 10, 5, 21
+        x_emb = self.source(input)
+        # print("x_emb shape ", x_emb.shape) # 10, 5, 21, 50
+        #x_emb = x_emb.transpose(2, 3)
+        #print(x_emb)
+        x_conv_out = torch.cat([self.cnn(row.squeeze(dim=0)).unsqueeze(dim=0) for row in x_emb.split(1)])
+        #print(x_conv_out)
+        # print("x_conv shape ", x_conv_out.shape)
+        x_hwy = self.highway(x_conv_out)
+
+        return x_hwy
+
 
         ### END YOUR CODE
 

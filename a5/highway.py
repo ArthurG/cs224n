@@ -12,11 +12,12 @@ import torch.nn.functional as F
 class Highway(nn.Module):
     # Remember to delete the above 'pass' after your implementation
     ### YOUR CODE HERE for part 1f
-    def __init__(self, e_word_size):
+    def __init__(self, e_word_size, dropout_prob):
         super(Highway, self).__init__()
         self.w_proj = nn.Linear(in_features = e_word_size, out_features = e_word_size, bias=True)
         self.w_gate = nn.Linear(in_features = e_word_size, out_features = e_word_size, bias=True)
         self.sigmoid = nn.Sigmoid()
+        self.dropout = nn.Dropout(dropout_prob)
 
     def forward(self, x_conv_out):
         # In: (batch_size, e_word_size)
@@ -25,7 +26,7 @@ class Highway(nn.Module):
         x_proj = F.relu(self.w_proj(x_conv_out))
         x_gate = self.sigmoid(self.w_proj(x_conv_out))
         x_highway = x_gate * x_proj + (1- x_gate) * x_conv_out
-        return x_highway
+        return self.dropout(x_highway)
 
     ### END YOUR CODE
 

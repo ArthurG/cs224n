@@ -83,7 +83,7 @@ def question_1f_sanity_check():
 
     """ Shape Dimension Check for Highway Class """
     inputs =torch.randint(100,size=(5, 100), dtype=torch.float)
-    highway = Highway(100)
+    highway = Highway(100, 0.3)
     out = highway(inputs)
     expected_out_shape = (5, 100)
     assert(torch.Size(expected_out_shape) == out.shape), "The shape of Highway output is incorrect" 
@@ -105,7 +105,7 @@ def question_1f_sanity_check():
         with torch.no_grad():
             model.apply(init_weights)
 
-    highway = Highway(5)
+    highway = Highway(5, 0)
     reinitialize_layers(highway)
     inputs =torch.tensor([[3, 5, 7, 11, 13]], dtype=torch.float) # Sums to 39
     # W * x + b = [3.9, 1.18, 19.6, -27.4, -35.2] 
@@ -130,15 +130,15 @@ def question_1g_sanity_check():
     """ Shape Dimension Check for CNN Class """
     batch_size = 6
 
-    m_word_size = 100
     e_char_size = 20
     num_filters = 10
     k = 5
+    m_word_size = 100
 
     e_word_size = num_filters
 
     inputs = torch.randint(100,size=(batch_size, e_char_size, m_word_size), dtype=torch.float)
-    convnet = CNN(100, 20, 10, 5, 1)
+    convnet = CNN(20, 10, 5, 1)
     out = convnet(inputs)
     expected_out_shape = (batch_size, e_word_size)
 
@@ -166,7 +166,7 @@ def question_1g_sanity_check():
     e_word_size = num_filters
 
     inputs = torch.tensor([[[1, 1, 1, 1, 0, 1]]], dtype=torch.float)
-    convnet = CNN(m_word_size, e_char_size, num_filters, k, 0)
+    convnet = CNN(e_char_size, num_filters, k, 0)
     reinitialize_layers(convnet)
     out = convnet(inputs)
     expected = np.array([[0.3]])
