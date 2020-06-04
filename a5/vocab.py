@@ -164,10 +164,8 @@ class VocabEntry(object):
         ### END YOUR CODE
         sents_ind = self.words2charindices(sents)
         sents_ind_padded = pad_sents_char(sents_ind,self.word2id['<pad>'])
-        sent_tensor = torch.tensor(sents_ind_padded)
-        # print("Sents shape ",t.shape)
-        sent_tensor_reshaped = torch.tensor(sents_ind_padded).transpose(0, 1).contiguous()
-        # print("Sents shape 2 ",t2.shape)
+        sent_tensor = torch.tensor(sents_ind_padded, device=device)
+        sent_tensor_reshaped = torch.tensor(sents_ind_padded, device=device).transpose(0, 1).contiguous()
         return sent_tensor_reshaped
 
     def to_input_tensor(self, sents: List[List[str]], device: torch.device) -> torch.Tensor:
