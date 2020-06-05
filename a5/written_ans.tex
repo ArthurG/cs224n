@@ -62,6 +62,86 @@ I'm confident that these three tests will cover the edge cases. In general, sinc
 
 My BLEU score is 36.51893424356271
 
+\question 
+
+traducir -> Not in vocab 
+
+traduzco -> In vocab 
+
+traduces -> Not in vocab 
+
+traduce -> In vocab 
+
+traduzca -> In vocab 
  
+traduzcas -> Not in vocab 
+
+
+This would be bad for the word-based NMT because the encoder would be unable to a few conjugations of 'traducir'. If the unseen versions of the verb occurs in the test set, the system likely output an <UNK> word. 
+
+The character-based NMT model overcomes this as it would likely learn an embedding for the common substring, namely 'tradu'. Then, if it sees a conjugation of the verb that is not in the vocab, it uses the prefix of the word to estimate an embedding, and then this prefix will most likely accuratley encode the meaning. 
+
+\question
+
+Financial -> Economic
+
+Neuron -> Nerve
+
+Francisco -> San
+
+naturally -> occuring 
+
+expectation -> norms 
+
+\question 
+
+
+Financial -> Vertical
+
+Neuron -> Newton
+
+Francisco -> France 
+
+naturally -> practically 
+
+expectation -> exception 
+
+
+\question
+
+In the Word2Vec embeddings, it appears that the neighbours have similar meaning or are words that are used in conjunction with one another.
+
+In the CharCNN embeddings, it appears that the neighbours have either a similar prefix or suffix. Most of the time, the neighbours don't have any relation to one another semantically. 
+
+\question 
+Incorrect example first 
+
+
+Source: Hoy estoy aqu para hablarles sobre crculos y epifanas.
+
+Reference : I'm here today to talk to you  about circles and epiphanies.
  
+Output (A4): I'm here to talk to you about circles and <unk>
+ 
+Output (A5): I'm here today to talk to you about circles and epidemiologists.
+
+
+The UNK got translated as epidemiologists. 
+
+During this translation, i think the encoder encountered 'epifanas' in spanish which it never saw before. So, it probably used the CharCNN model, which means that the word had similar embedding to 'epidemióloga' (meaning epiodemiologist). Then, the decoder probably had the word 'epidemiologist' in its vocab, and outputed that. 
+ 
+Correct Example"
+
+Source: Entonces ella me deca: "Bueno y qu hars cuando vengas?"   
+
+Reference: And she'd say, "Well what are you going to do when you get here?
+
+Output (A4) : So she said, "Well what are you going to do when you <unk>
+
+Output (A5) : So she said,``Well, what do you do  when you come? ''
+
+The UNK got translated as 'get here'
+
+During this translation, I think the encoder encountered 'vengas', which was probably not in the spanish vocab for the encoder. As a result, in A4, this was translated as UNK. In a5, I believe the CharCNN model encoder was probably able to find a match for the root word of 'vengas' (perhaps venir?). Then, the word was decoded properly. 
+
 \end{document}
